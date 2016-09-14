@@ -159,3 +159,120 @@ void QuickUnionUF::Union(int begin, int end)
     id[broot] = eroot;
   }
 }
+
+
+//--------------------------------------------------------------------------------
+
+WeightedQuickUnionUF::WeightedQuickUnionUF()
+  :size(10)
+{
+  init();
+}
+
+WeightedQuickUnionUF::WeightedQuickUnionUF(const int &n)
+  :size(n)
+{
+  init();
+}
+
+WeightedQuickUnionUF::WeightedQuickUnionUF(const WeightedQuickUnionUF &others)
+  :id(NULL),
+  sz(NULL),
+  size(others.size)
+{
+  resize(&id, others.id, size);
+  resize(&sz, others.sz, size);
+}
+
+WeightedQuickUnionUF::~WeightedQuickUnionUF()
+{
+  size = 0;
+
+  remove(&id);
+  remove(&sz);
+}
+
+/// Initialized each element of id array by itself
+/// each element of sz by 1.
+void WeightedQuickUnionUF::init()
+{
+  if(size > 0)
+  {
+    id = new int[size];
+    sz = new int[size];
+    for(int i= 0; i < size; ++i)
+    {
+      id[i] = i;
+      sz[i] = 1;
+    }
+  }
+}
+
+void WeightedQuickUnionUF::resize(int **out, const int *in, const int size)
+{
+  if(size > 0)
+  {
+    remove(out);
+
+    *out = new int[size];
+    for(int i = 0; i < size; ++i)
+      (*out)[i] = in[i];
+  }
+}
+
+void WeightedQuickUnionUF::remove(int **ptr)
+{
+  if(*ptr != NULL)
+  {
+    delete *ptr;
+    *ptr = NULL;
+  }
+}
+
+/// chase parent pointer untill reach root
+int WeightedQuickUnionUF::root(const int &val) const
+{
+  int pos = val;
+
+  while(id[pos] != pos)
+  {
+    pos = id[pos];
+    // id[pos] = id[id[pos]];
+  }
+
+  return pos;
+}
+
+/// pair of numbers will be connected if and only if,
+/// both have in same root (parent).
+bool WeightedQuickUnionUF::Connected(int begin, int end) const
+{
+  return( root(begin) == root(end) );
+}
+
+/// change root of small weighted tree by root of big weighted tree.
+/// example: union(6, 1)
+/// if root(6) = 8
+///    root(1) = 2
+///
+/// then (if sz[8] < sz[2])
+///     id[8] = 2
+/// else
+///     id[2] = 8
+/// And increase sz accordingly.
+void WeightedQuickUnionUF::Union(int begin, int end)
+{
+  int broot = root(begin);
+  int eroot = root(end);
+
+  if(sz[broot] < sz[eroot])
+  {
+    id[broot] = eroot;
+    sz[eroot] += sz[broot];
+  }
+  else
+  {
+    id[eroot] = broot;
+    sz[broot] +=sz[eroot];
+  }
+}

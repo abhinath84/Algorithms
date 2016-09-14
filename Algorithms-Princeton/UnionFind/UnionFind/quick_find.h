@@ -70,3 +70,38 @@ class QuickUnionUF
     int *id;
     int size;
 };
+
+/* 
+  Weighted Quick-union
+*/
+
+/*    |------------------------|------------|------ |------|
+      |        algorithm       | initialize | union | find |
+      |------------------------|------------|------ |------|
+      |  WeightedQuickUnionUF  |     N      | lg N  | lg N |
+      |------------------------|------------|------ |------|
+
+      Proposition: Depth of any node x is at most lg N.
+*/
+class WeightedQuickUnionUF
+{
+  public:
+    WeightedQuickUnionUF();
+    WeightedQuickUnionUF(const int &n);
+    WeightedQuickUnionUF(const WeightedQuickUnionUF &others);
+    ~WeightedQuickUnionUF();
+
+    bool Connected(int begin, int end) const;
+    void Union(int begin, int end);
+
+  private:
+    void init();
+    void resize(int **out, const int *in, const int size);
+    int  root(const int &val) const;
+    void remove(int **ptr);
+
+  private:
+    int *id;
+    int *sz;
+    int size;
+};
